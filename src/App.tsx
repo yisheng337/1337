@@ -87,7 +87,18 @@ const App: React.FC = () => {
   };
 
   const removeFile = (id: string) => {
+    const file = files.find(f => f.id === id);
+    if (file?.outputUrl) URL.revokeObjectURL(file.outputUrl);
     setFiles(prev => prev.filter(f => f.id !== id));
+  };
+
+  // 一键清空列表
+  const clearList = () => {
+    files.forEach(f => {
+      if (f.outputUrl) URL.revokeObjectURL(f.outputUrl);
+    });
+    setFiles([]);
+    setDirHandle(null);
   };
 
   const startConversion = async () => {
@@ -211,6 +222,13 @@ const App: React.FC = () => {
             </div>
 
             <div className="config-group">
+              <button 
+                className="btn btn-secondary" 
+                onClick={clearList}
+                disabled={isProcessing || files.length === 0}
+              >
+                <Trash2 size={18} /> 清空列表
+              </button>
               {files.some(f => f.status === 'completed') && (
                 <div style={{ display: 'flex', gap: '8px' }}>
                   <button className="btn btn-secondary" onClick={downloadAllAsZip}>
